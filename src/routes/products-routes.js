@@ -4,6 +4,8 @@ const db = require("../database");
 const Joi = require("joi");
 const validator = require("../middlewares/validator")
 
+const productController = require("../controllers/products-controller")
+
 const productCreationSchema = Joi.object({
     name: Joi.string().alphanum().min(2).max(32),
     quantity: Joi.number().min(1).max(65535),
@@ -38,20 +40,7 @@ productRouter.get("/test", async (request, response) => {
 
 
 //POST
-productRouter.post("/", validator({body: productCreationSchema}), async (request, response) => {
-    console.log(request.body);
-    try
-    {
-        const dbRes = await db.query("INSERT INTO products (productname, quantity, price) VALUES ($1, $2, $3) RETURNING *", [request.body.name, request.body.quantity, request.body.price])
-        //console.log(dbRes)
-        response.send(`Product added`)
-    }
-    catch (error)
-    {
-        console.log("deu ruim chefia")
-        response.status(500).send(error.detail);
-    }
-})
+productRouter.post("/", validator({body: productCreationSchema}), productController.createProduct)
 
 
 //PUT
